@@ -26,7 +26,7 @@ class Nutrition5k(Dataset):
 
         legit_files = []
 
-        with open('excluded_files.txt', 'r') as infile:
+        with open('config/excluded_files.txt', 'r') as infile:
             excluded_files = [file.strip() for file in infile.readlines()]
 
         for file in file_list:
