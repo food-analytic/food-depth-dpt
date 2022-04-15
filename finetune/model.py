@@ -2,7 +2,7 @@ from math import ceil
 from torch import optim
 from torch.utils.data import DataLoader
 from pytorch_lightning import LightningModule
-from timm import create_optimizer_v2
+from timm.optim import create_optimizer_v2
 from ..dpt.models import DPTDepthModel
 from .loss import SILog
 from .dataset import Nutrition5k
