@@ -3,7 +3,7 @@ import cv2
 from torch.utils.data import Dataset
 from torchvision.transforms import Compose
 import albumentations as A
-from ..dpt.transforms import Resize, NormalizeImage, PrepareForNet
+from dpt.transforms import Resize, NormalizeImage, PrepareForNet
 
 
 class Nutrition5k(Dataset):
@@ -25,9 +25,7 @@ class Nutrition5k(Dataset):
             file_list = [file.strip() for file in infile.readlines()]
 
         legit_files = []
-
-        with open('config/excluded_files.txt', 'r') as infile:
-            excluded_files = [file.strip() for file in infile.readlines()]
+        excluded_files = config['excluded_files']
 
         for file in file_list:
             depth_image_path = os.path.join(
