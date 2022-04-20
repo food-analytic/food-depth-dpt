@@ -10,7 +10,7 @@ def get_base_parser():
     parser.add_argument(
         "--model_path", type=str, default="weights/dpt_hybrid-midas-501f0c75.pt"
     )
-    parser.add_argument("--dataset_path", type=str, default="data/dpt_hybrid_midas_5k")
+    parser.add_argument("--dataset_path", type=str, default="data/nutrition5k")
     parser.add_argument("--batch_size", type=int, default=16)
 
     return parser
