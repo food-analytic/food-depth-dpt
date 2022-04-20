@@ -1,4 +1,4 @@
-from .dataset import *
-from .loss import *
-from .model import *
+from .datasets import *
+from .losses import *
+from .models import *
 from .utils import *

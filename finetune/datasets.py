@@ -7,10 +7,15 @@ from dpt.transforms import Resize, NormalizeImage, PrepareForNet
 
 
 class Nutrition5k(Dataset):
-    def __init__(self, is_train, config):
+    def __init__(self,
+        is_train,
+        dataset_path,
+        image_size=(384, 384),
+        excluded_files = [],
+    ):
 
         self.is_train = is_train
-        self.dataset_path = config["dataset_path"]
+        self.dataset_path = dataset_path
 
         if self.is_train:
             self.filepath = os.path.join(
@@ -25,7 +30,6 @@ class Nutrition5k(Dataset):
             file_list = [file.strip() for file in infile.readlines()]
 
         legit_files = []
-        excluded_files = config['excluded_files']
 
         for file in file_list:
             depth_image_path = os.path.join(
@@ -60,8 +64,8 @@ class Nutrition5k(Dataset):
         self.transform = Compose(
             [
                 Resize(
-                    config["image_size"][0],
-                    config["image_size"][1],
+                    image_size[0],
+                    image_size[1],
                     resize_target=True,
                     keep_aspect_ratio=True,
                     ensure_multiple_of=32,

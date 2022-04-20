@@ -3,34 +3,46 @@ from torch.utils.data import DataLoader
 from pytorch_lightning import LightningModule
 from timm.optim import create_optimizer_v2
 from dpt.models import DPTDepthModel
-from .loss import SILog
-from .dataset import Nutrition5k
+from .losses import SILog
+from .datasets import Nutrition5k
 
 
 class DPTModule(LightningModule):
     def __init__(
         self,
-        config,
+        model_path,
+        dataset_path,
+        scale=1,
+        shift=0,
+        batch_size=16,
+        base_lr=1e-5,
+        max_lr=1e-4,
+        num_workers=2,
+        image_size=(384, 384),
+        excluded_files=[],
         **kwargs
     ):
 
         super().__init__(**kwargs)
 
-        self._config = config
-
         self.model = DPTDepthModel(
-            path=config.model_path,
-            scale=config.base_scale,
-            shift=config.base_shift,
+            path=model_path,
+            scale=scale,
+            shift=shift,
             invert=True,
             backbone="vitb_rn50_384",
             non_negative=True,
             enable_attention_hooks=False,
         )
 
-        self.batch_size = config.batch_size
-        self.base_lr = config.base_lr
-        self.max_lr = config.max_lr
+        self.batch_size = batch_size
+        self.base_lr = base_lr
+        self.max_lr = max_lr
+
+        self._dataset_path = dataset_path
+        self._num_workers = num_workers
+        self._image_size = image_size
+        self._excluded_files = excluded_files
 
         self._loss_function = SILog
 
@@ -77,15 +89,15 @@ class DPTModule(LightningModule):
 
     def setup(self, stage=None):
         if stage == "fit" or stage is None:
-            self._nutrition5k_train = Nutrition5k(is_train=True, config=self._config)
-            self._nutrition5k_val = Nutrition5k(is_train=False, config=self._config)
+            self._nutrition5k_train = Nutrition5k(True, self._dataset_path, self._image_size, self._excluded_files)
+            self._nutrition5k_val = Nutrition5k(False, self._dataset_path, self._image_size, self._excluded_files)
 
     def train_dataloader(self):
         return DataLoader(
             self._nutrition5k_train,
             batch_size=self.batch_size,
             shuffle=True,
-            num_workers=self._config.num_workers,
+            num_workers=self._num_workers,
             pin_memory=True,
         )
 
@@ -94,6 +106,6 @@ class DPTModule(LightningModule):
             self._nutrition5k_val,
             batch_size=self.batch_size,
             shuffle=False,
-            num_workers=self._config.num_workers,
+            num_workers=self._num_workers,
             pin_memory=True,
         )
