@@ -12,6 +12,7 @@ def get_train_parser():
     parser.add_argument("--epochs", type=int, default=100)
     parser.add_argument("--base_lr", type=float, default=1e-5)
     parser.add_argument("--max_lr", type=float, default=1e-4)
+    parser.add_argument("--early_stopping", type=int, default=None)
     parser.add_argument("--num_workers", type=int, default=2)
     parser.add_argument("--devices", default="auto")
     parser.add_argument("--accelerator", default="auto")
