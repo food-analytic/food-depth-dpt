@@ -7,11 +7,12 @@ from dpt.transforms import Resize, NormalizeImage, PrepareForNet
 
 
 class Nutrition5k(Dataset):
-    def __init__(self,
+    def __init__(
+        self,
         is_train,
         dataset_path,
         image_size=(384, 384),
-        excluded_files = [],
+        excluded_files=[],
     ):
 
         self.is_train = is_train

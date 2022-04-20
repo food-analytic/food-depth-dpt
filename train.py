@@ -2,13 +2,13 @@ from finetune import DPTModule
 from configs import get_train_parser
 import pytorch_lightning as pl
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     args = get_train_parser().parse_args()
 
-    with open(args.excluded_files, 'r') as infile:
+    with open(args.excluded_files, "r") as infile:
         excluded_files = [line.strip() for line in infile]
-    
+
     model = DPTModule(
         args.model_path,
         args.dataset_path,
