@@ -25,7 +25,7 @@ if __name__ == "__main__":
     logger = pl.loggers.TensorBoardLogger(save_dir=args.save_log)
     lr_monitor = pl.callbacks.LearningRateMonitor()
     model_checkpoint = pl.callbacks.ModelCheckpoint(args.save_ckpt)
-    early_stopping = pl.callbacks.EarlyStopping(patience=10)
+    early_stopping = pl.callbacks.EarlyStopping(monitor='val_loss', patience=10)
 
     trainer = pl.Trainer(
         devices=args.devices,
