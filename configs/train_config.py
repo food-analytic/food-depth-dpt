@@ -6,7 +6,7 @@ def get_train_parser():
 
     parser.add_argument("--load_ckpt", type=str, default=None)
     parser.add_argument("--save_ckpt", type=str, default=None)
-    parser.add_argument("--save_log", type=str, default=None)
+    parser.add_argument("--save_log", type=str, default=".")
     parser.add_argument("--excluded_files", type=str, default="configs/excluded_files.txt")
 
     parser.add_argument("--epochs", type=int, default=100)
