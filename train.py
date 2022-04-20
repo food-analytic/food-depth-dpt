@@ -23,21 +23,20 @@ if __name__ == "__main__":
     )
 
     logger = pl.loggers.TensorBoardLogger(save_dir=args.save_log)
-    lr_monitor = pl.callbacks.LearningRateMonitor()
-    model_checkpoint = pl.callbacks.ModelCheckpoint(args.save_ckpt)
+    callbacks = []
+    callbacks.append(pl.callbacks.LearningRateMonitor())
+    callbacks.append(pl.callbacks.ModelCheckpoint(args.save_ckpt))
     if args.early_stopping is not None:
-        early_stopping = pl.callbacks.EarlyStopping(
-            monitor="val_loss", patience=args.early_stopping
+        callbacks.append(
+            pl.callbacks.EarlyStopping(monitor="val_loss", patience=args.early_stopping)
         )
-    else:
-        early_stopping = None
 
     trainer = pl.Trainer(
         devices=args.devices,
         accelerator=args.accelerator,
         max_epochs=args.epochs,
         logger=logger,
-        callbacks=[lr_monitor, model_checkpoint, early_stopping],
+        callbacks=callbacks,
     )
 
     trainer.fit(model, ckpt_path=args.load_ckpt)
