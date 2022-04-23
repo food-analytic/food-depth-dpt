@@ -98,16 +98,16 @@ class DPTModule(LightningModule):
 
     def setup(self, stage=None):
         if stage == "fit" or stage is None:
-            self.nutrition5k_train = Nutrition5k(
+            self._nutrition5k_train = Nutrition5k(
                 True, self._dataset_path, self._image_size, self._excluded_files
             )
-            self.nutrition5k_val = Nutrition5k(
+            self._nutrition5k_val = Nutrition5k(
                 False, self._dataset_path, self._image_size, self._excluded_files
             )
 
     def train_dataloader(self):
         return DataLoader(
-            self.nutrition5k_train,
+            self._nutrition5k_train,
             batch_size=self.batch_size,
             shuffle=True,
             num_workers=self._num_workers,
@@ -116,7 +116,7 @@ class DPTModule(LightningModule):
 
     def val_dataloader(self):
         return DataLoader(
-            self.nutrition5k_val,
+            self._nutrition5k_val,
             batch_size=self.batch_size,
             shuffle=False,
             num_workers=self._num_workers,
