@@ -1,4 +1,5 @@
 import os
+import numpy as np
 import cv2
 from torch.utils.data import Dataset
 from torchvision.transforms import Compose
@@ -93,9 +94,11 @@ class Nutrition5k(Dataset):
         rgb_image = cv2.imread(rgb_image_path)
         rgb_image = cv2.cvtColor(rgb_image, cv2.COLOR_BGR2RGB)
         rgb_image = rgb_image / 255.0
+        rgb_image = rgb_image.astype(np.float32)
 
         depth_image = depth_image / 10000.0
         inverse_depth = 1 / (depth_image + 1e-8)
+        inverse_depth = inverse_depth.astype(np.float32)
 
         mask = (depth_image > 0).astype(int)
 
