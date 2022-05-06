@@ -15,7 +15,6 @@ class Nutrition5k(Dataset):
         dataset_path,
         image_size=(384, 384),
         excluded_files=[],
-        apply_augmentations=True,
     ):
 
         self.is_train = is_train
@@ -52,10 +51,8 @@ class Nutrition5k(Dataset):
 
         self.files = legit_files
 
-        self.apply_augmentations = apply_augmentations
         self.augment = A.Compose(
             [
-                CutDepth(p=0.75, p_param=0.75),
                 A.RandomCrop(480, 480, p=1.0),
                 A.Flip(p=0.5),
                 A.Blur(blur_limit=5, p=0.5),
@@ -99,8 +96,6 @@ class Nutrition5k(Dataset):
 
         rgb_image = cv2.imread(rgb_image_path)
         rgb_image = cv2.cvtColor(rgb_image, cv2.COLOR_BGR2RGB)
-        rgb_image = rgb_image / 255.0
-        rgb_image = rgb_image.astype(np.float32)
 
         depth_image = depth_image / 10000.0
         inverse_depth = 1 / (depth_image + 1e-8)
@@ -108,7 +103,7 @@ class Nutrition5k(Dataset):
 
         mask = (depth_image > 0).astype(int)
 
-        if self.is_train and self.apply_augmentations:
+        if self.is_train:
             augmented = self.augment(image=rgb_image, depth=inverse_depth, mask=mask)
             rgb_image, inverse_depth, mask = (
                 augmented["image"],
@@ -116,15 +111,18 @@ class Nutrition5k(Dataset):
                 augmented["mask"],
             )
 
+        rgb_image = rgb_image / 255.0
+        rgb_image = rgb_image.astype(np.float32)
+
         transformed_image = self.transform(
             {"image": rgb_image, "depth": inverse_depth, "mask": mask}
         )
 
-        return (
-            transformed_image["image"],
-            transformed_image["depth"],
-            transformed_image["mask"],
-        )
+        rgb_image = transformed_image["image"]
+        inverse_depth = transformed_image["depth"]
+        mask = transformed_image["mask"]
+
+        return rgb_image, inverse_depth, mask
 
     def __len__(self):
         return len(self.files)

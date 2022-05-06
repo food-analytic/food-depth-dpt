@@ -1,14 +1,12 @@
 import random
-from albumentations.core.transforms_interface import ImageOnlyTransform
 
 
-class CutDepth(ImageOnlyTransform):
-    def __init__(self, p=0.5, p_param=0.5, **kwargs):
-        super().__init__(**kwargs)
+class CutDepth:
+    def __init__(self, p=0.5, p_param=0.5):
         self.p = p
         self.p_param = p_param
 
-    def apply(self, image, depth):
+    def __call__(self, image, depth):
         if random.random() < self.p:
             H, W, _ = image.shape
 
