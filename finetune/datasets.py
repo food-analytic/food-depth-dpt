@@ -5,6 +5,7 @@ from torch.utils.data import Dataset
 from torchvision.transforms import Compose
 import albumentations as A
 from dpt.transforms import Resize, NormalizeImage, PrepareForNet
+from .transforms import CutDepth
 
 
 class Nutrition5k(Dataset):
@@ -14,6 +15,7 @@ class Nutrition5k(Dataset):
         dataset_path,
         image_size=(384, 384),
         excluded_files=[],
+        apply_augmentations=True,
     ):
 
         self.is_train = is_train
@@ -50,18 +52,22 @@ class Nutrition5k(Dataset):
 
         self.files = legit_files
 
-        self.normalization = NormalizeImage(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
-
+        self.apply_augmentations = apply_augmentations
         self.augment = A.Compose(
             [
+                CutDepth(p=0.75, p_param=0.75),
+                A.RandomCrop(480, 480, p=1.0),
+                A.Flip(p=0.5),
                 A.Blur(blur_limit=5, p=0.5),
                 A.GaussNoise(p=0.5),
                 A.RandomBrightnessContrast(p=0.5),
                 A.HueSaturationValue(p=0.5),
-                A.Flip(p=0.5),
+                A.RandomGamma(p=0.5),
             ],
             additional_targets={"depth": "mask"},
         )
+
+        self.normalization = NormalizeImage(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
 
         self.transform = Compose(
             [
@@ -102,7 +108,7 @@ class Nutrition5k(Dataset):
 
         mask = (depth_image > 0).astype(int)
 
-        if self.is_train:
+        if self.is_train and self.apply_augmentations:
             augmented = self.augment(image=rgb_image, depth=inverse_depth, mask=mask)
             rgb_image, inverse_depth, mask = (
                 augmented["image"],
