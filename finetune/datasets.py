@@ -5,51 +5,30 @@ from torch.utils.data import Dataset
 from torchvision.transforms import Compose
 import albumentations as A
 from dpt.transforms import Resize, NormalizeImage, PrepareForNet
-from .transforms import CutDepth
 
 
 class Nutrition5k(Dataset):
     def __init__(
         self,
-        is_train,
+        split,
         dataset_path,
         image_size=(384, 384),
-        excluded_files=[],
     ):
 
-        self.is_train = is_train
+        self.split = split
         self.dataset_path = dataset_path
 
-        if self.is_train:
-            self.filepath = os.path.join(
-                self.dataset_path, "dish_ids/splits/depth_train_ids.txt"
-            )
+        if self.split == "train":
+            self.filepath = "finetune/splits/train.txt"
+        elif self.split == "val":
+            self.filepath = "finetune/splits/val.txt"
+        elif self.split == "test":
+            self.filepath = "finetune/splits/test.txt"
         else:
-            self.filepath = os.path.join(
-                self.dataset_path, "dish_ids/splits/depth_test_ids.txt"
-            )
+            raise ValueError("Invalid split name.")
 
         with open(self.filepath) as infile:
-            file_list = [file.strip() for file in infile.readlines()]
-
-        legit_files = []
-
-        for file in file_list:
-            depth_image_path = os.path.join(
-                self.dataset_path, "realsense_overhead", file, "depth_raw.png"
-            )
-            rgb_image_path = os.path.join(
-                self.dataset_path, "realsense_overhead", file, "rgb.png"
-            )
-
-            if (
-                os.path.exists(depth_image_path)
-                and os.path.exists(rgb_image_path)
-                and file not in excluded_files
-            ):
-                legit_files.append(file)
-
-        self.files = legit_files
+            self.files = [file.strip() for file in infile.readlines()]
 
         self.augment = A.Compose(
             [
@@ -103,7 +82,7 @@ class Nutrition5k(Dataset):
 
         mask = (depth_image > 0).astype(int)
 
-        if self.is_train:
+        if self.split == "train":
             augmented = self.augment(image=rgb_image, depth=inverse_depth, mask=mask)
             rgb_image, inverse_depth, mask = (
                 augmented["image"],

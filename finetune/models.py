@@ -19,16 +19,6 @@ class DPTModule(LightningModule):
         max_lr=1e-4,
         num_workers=2,
         image_size=(384, 384),
-        excluded_files=[
-            "dish_1558109714",
-            "dish_1557861837",
-            "dish_1558031675",
-            "dish_1564159636",
-            "dish_1558029518",
-            "dish_1557862384",
-            "dish_1556572657",
-            "dish_1558109511",
-        ],
         **kwargs
     ):
 
@@ -51,7 +41,6 @@ class DPTModule(LightningModule):
         self._dataset_path = dataset_path
         self._num_workers = num_workers
         self._image_size = image_size
-        self._excluded_files = excluded_files
 
         self._loss_function = SILog
 
@@ -99,10 +88,14 @@ class DPTModule(LightningModule):
     def setup(self, stage=None):
         if stage == "fit" or stage is None:
             self._nutrition5k_train = Nutrition5k(
-                True, self._dataset_path, self._image_size, self._excluded_files
+                "train",
+                self._dataset_path,
+                self._image_size,
             )
             self._nutrition5k_val = Nutrition5k(
-                False, self._dataset_path, self._image_size, self._excluded_files
+                "val",
+                self._dataset_path,
+                self._image_size,
             )
 
     def train_dataloader(self):
