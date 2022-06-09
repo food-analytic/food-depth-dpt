@@ -1,4 +1,4 @@
-# DPT Trained on Nutrition5k
+# DPT Finetuned on Nutrition5k
 
 Weights
 - [Fine-tuned DPT without augmentation](https://drive.google.com/file/d/1cZ7UBLY6cAin1RstSNroMl-PG0zxrSRN)
